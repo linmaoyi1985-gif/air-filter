@@ -4,9 +4,10 @@
 # GitHub App permissions prevent Claude from creating workflow files directly.
 #
 # To enable GitHub Pages deployment:
-# 1. Copy this file to: .github/workflows/deploy-pages.yml (remove the .example extension)
-# 2. Commit and push the file
-# 3. Enable GitHub Pages in repository settings:
+# 1. Create file: .github/workflows/deploy-pages.yml
+# 2. Copy the content below into that file
+# 3. Commit and push the file
+# 4. Enable GitHub Pages in repository settings:
 #    Settings → Pages → Source: GitHub Actions
 #
 # The workflow will automatically deploy to GitHub Pages on every push to main branch.
