@@ -1,0 +1,67 @@
+# GitHub Pages Deployment Workflow
+#
+# IMPORTANT: This file must be manually created by you.
+# GitHub App permissions prevent Claude from creating workflow files directly.
+#
+# To enable GitHub Pages deployment:
+# 1. Copy this file to: .github/workflows/deploy-pages.yml (remove the .example extension)
+# 2. Commit and push the file
+# 3. Enable GitHub Pages in repository settings:
+#    Settings → Pages → Source: GitHub Actions
+#
+# The workflow will automatically deploy to GitHub Pages on every push to main branch.
+# Your site will be available at: https://linmaoyi1985-gif.github.io/air-filter/
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
