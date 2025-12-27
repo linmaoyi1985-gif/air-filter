@@ -1,258 +1,468 @@
-# 跨境电商AI应用（App Hub）
+# Cross-Border E-Commerce AI Tools Hub
 
-一个专为跨境电商卖家打造的工具集合平台，提供多个实用的小应用，帮助卖家提升运营效率。
+A modern, lightweight platform designed for cross-border e-commerce sellers, providing a suite of productivity tools to streamline operations and boost efficiency.
 
-## 功能特性
+## Overview
 
-- 📦 **多应用集成**：一个平台集成多个小工具
-- 🗂️ **分类管理**：按业务类目组织应用
-- 🔍 **快速搜索**：支持按名称、描述、标签搜索
-- 🎨 **简洁界面**：无需复杂UI框架，快速加载
-- 🚀 **易于扩展**：标准化的应用添加流程
+This project is a **Next.js 15** application built with **TypeScript** and **Tailwind CSS**, featuring:
+- GitHub OAuth authentication with whitelist support
+- Server-side n8n webhook integration
+- Modular app registry system
+- Lightweight, performant architecture with minimal dependencies
 
-## 技术栈
+**Current Status**: Migrated from Vite + React to Next.js App Router (Node.js 18+)
 
-- ⚡ Vite - 快速构建工具
-- ⚛️ React 18 - UI 框架
-- 📘 TypeScript - 类型安全
-- 🎨 原生 CSS - 轻量级样式
+## Tech Stack
 
-## 快速开始
+| Technology | Purpose |
+|---|---|
+| **Next.js 15** | App Router, Server Components, API Routes |
+| **React 18** | UI Framework |
+| **TypeScript** | Type Safety |
+| **Tailwind CSS** | Styling |
+| **Auth.js 5** | GitHub OAuth Authentication |
+| **n8n Integration** | Server-side Webhook Management |
+| **Vercel** | Recommended Deployment Platform |
 
-### 安装依赖
+## Features
+
+### 1. GitHub OAuth Authentication
+- Secure OAuth 2.0 login via GitHub
+- Flexible whitelist system:
+  - Option 1: Whitelist specific GitHub usernames
+  - Option 2: Whitelist email domains (e.g., company.com)
+  - Combine both for maximum flexibility
+
+### 2. App Registry System
+- Single source of truth: `src/registry.ts`
+- Standardized app structure with `meta.ts` and `App.tsx`
+- Support for 10 predefined app categories:
+  - Keyword Research
+  - PPC Ads
+  - Competitor Intel
+  - Listing & SEO
+  - Data Tools
+  - Profit & FBA
+  - Supply Chain
+  - Compliance
+  - Ops Automation
+  - Other
+
+### 3. Built-in Applications
+
+#### Keyword Deduplicator
+- **Category**: Keyword Research
+- **Function**: Deduplicates and sorts multi-line keywords
+- **Use Case**: Merge keyword lists, remove duplicates
+
+#### CSV/TSV Converter
+- **Category**: Data Tools
+- **Function**: Convert between CSV and TSV formats with preview
+- **Use Case**: Quick data format conversion and validation
+
+#### Profit Calculator
+- **Category**: Profit & FBA
+- **Function**: Calculate profit margin and ROI based on pricing inputs
+- **Use Case**: Product pricing analysis and profitability assessment
+
+#### ASIN → Keywords (DataForSEO)
+- **Category**: Keyword Research
+- **Function**: Retrieve ranked keywords for Amazon ASINs via DataForSEO API
+- **Use Case**: Keyword research and competitor analysis
+- **Integration**: n8n webhook-based backend
+
+## Quick Start
+
+### Prerequisites
+- **Node.js 18+** (verified with Node 22)
+- **npm** or **yarn** or **pnpm**
+- GitHub OAuth app credentials
+
+### 1. Clone & Install
 
 ```bash
-npm ci
+git clone https://github.com/linmaoyi1985-gif/air-filter.git
+cd air-filter
+
+# Install dependencies
+npm install
+# or: yarn install / pnpm install
 ```
 
-### 开发模式
+### 2. Environment Variables
+
+Copy the example file and configure:
 
 ```bash
+cp .env.example .env.local
+```
+
+Edit `.env.local` with your credentials:
+
+```env
+# Auth Configuration
+AUTH_SECRET=<generate-with-openssl-rand-base64-32>
+AUTH_GITHUB_ID=<your-github-oauth-client-id>
+AUTH_GITHUB_SECRET=<your-github-oauth-client-secret>
+
+# Whitelist Configuration (at least one required)
+ALLOWED_GITHUB_LOGINS=username1,username2
+# OR
+ALLOWED_EMAIL_DOMAINS=company.com,partner.com
+
+# n8n Webhook (optional, for ASIN Keywords app)
+N8N_WEBHOOK_URL=https://your-n8n-instance.com/webhook/your-webhook-id
+N8N_WEBHOOK_SECRET=your-optional-secret
+```
+
+### 3. GitHub OAuth Setup
+
+1. Go to GitHub Settings → Developer Settings → OAuth Apps
+2. Click "New OAuth App" with:
+   - **Application name**: "Air Filter App Hub" (or your choice)
+   - **Homepage URL**: `http://localhost:3000` (dev) or `https://yourdomain.com` (prod)
+   - **Authorization callback URL**: `http://localhost:3000/api/auth/callback/github` (dev)
+
+3. Copy the **Client ID** and **Client Secret** to `.env.local`
+
+**For Production (Vercel)**:
+- Homepage URL: `https://yourdomain.vercel.app`
+- Callback URL: `https://yourdomain.vercel.app/api/auth/callback/github`
+
+### 4. Local Development
+
+```bash
+# Start development server (default: http://localhost:3000)
 npm run dev
+
+# The app will be available at:
+# http://localhost:3000
 ```
 
-访问 http://localhost:5173
-
-### 构建生产版本
+### 5. Build for Production
 
 ```bash
+# Build optimized production bundle
 npm run build
+
+# Test production build locally
+npm start
 ```
 
-构建产物位于 `dist/` 目录。
+## Deployment
 
-### 预览生产版本
+### Vercel (Recommended)
+
+**One-Click Deploy**:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Flinmaoyi1985-gif%2Fair-filter&project-name=air-filter&repository-name=air-filter&env=AUTH_SECRET,AUTH_GITHUB_ID,AUTH_GITHUB_SECRET,ALLOWED_GITHUB_LOGINS,N8N_WEBHOOK_URL&envDescription=Required%20environment%20variables%20for%20Air%20Filter&envLink=https%3A%2F%2Fgithub.com%2Flinmaoyi1985-gif%2Fair-filter%2Fblob%2Fmain%2F.env.example)
+
+**Manual Steps**:
+
+1. Push your code to GitHub
+2. Go to [Vercel Dashboard](https://vercel.com)
+3. Click "Add New..." → "Project"
+4. Select the `air-filter` repository
+5. Configure environment variables (see Environment Variables section)
+6. Click "Deploy"
+
+**Post-Deployment**:
+- Update GitHub OAuth app callback URLs to point to your Vercel domain
+- Test authentication flow in production
+
+### Other Platforms (Docker, Self-hosted)
 
 ```bash
-npm run preview
+# Build Docker image
+docker build -t air-filter .
+
+# Run container
+docker run -p 3000:3000 \
+  -e AUTH_SECRET="..." \
+  -e AUTH_GITHUB_ID="..." \
+  -e AUTH_GITHUB_SECRET="..." \
+  air-filter
 ```
 
-## 应用类目
+## Project Structure
 
-目前支持以下类目：
+```
+air-filter/
+├── app/                          # Next.js App Router
+│   ├── api/auth/[auth].ts       # Auth.js API route
+│   ├── page.tsx                 # Home page
+│   ├── app/[slug]/page.tsx      # App detail page
+│   └── layout.tsx               # Root layout
+├── src/
+│   ├── apps/                    # All applications
+│   │   ├── keyword-dedup/       # Keyword deduplicator
+│   │   │   ├── App.tsx          # React component
+│   │   │   └── meta.ts          # Metadata
+│   │   ├── csv-converter/       # CSV/TSV converter
+│   │   ├── profit-calculator/   # Profit calculator
+│   │   └── asin-keywords/       # ASIN → Keywords
+│   ├── components/              # Shared components
+│   ├── lib/                     # Utility functions
+│   ├── types.ts                 # TypeScript types
+│   └── registry.ts              # App registry (single source of truth)
+├── docs/
+│   └── n8n-setup.md            # n8n integration guide
+├── auth.config.ts              # Auth.js configuration
+├── middleware.ts               # Next.js middleware
+├── package.json
+├── tsconfig.json
+├── tailwind.config.ts
+├── CLAUDE.md                    # App addition rules (MUST READ)
+└── README.md                    # This file
+```
 
-1. **Keyword Research** - 关键词与词库
-2. **PPC Ads** - 广告投放与结构
-3. **Competitor Intel** - 竞品情报
-4. **Listing & SEO** - Listing与转化
-5. **Data Tools** - 数据工具/清洗/导出
-6. **Profit & FBA** - 利润/费用/FBA
-7. **Supply Chain** - 供应链与库存
-8. **Compliance** - 合规/政策
-9. **Ops Automation** - 运营自动化
-10. **Other** - 其他
+## How to Add New Apps
 
-## 内置应用
-
-### 关键词去重工具
-- **类目**: Keyword Research
-- **功能**: 输入多行关键词，自动去重并排序，一键复制结果
-- **使用场景**: 整理关键词列表、合并多个词库
-
-### CSV/TSV转换器
-- **类目**: Data Tools
-- **功能**: 输入CSV或TSV文本，预览表格，导出为CSV文件
-- **使用场景**: 快速查看和转换表格数据
-
-### 利润计算器
-- **类目**: Profit & FBA
-- **功能**: 输入售价、成本、平台费率、运费，快速计算利润和毛利率
-- **使用场景**: 产品定价、利润分析
-
-## 如何添加新应用
-
-### 步骤 1: 创建应用目录
-
-在 `src/apps/` 下创建新目录，目录名即为应用的 `slug`：
+### Step 1: Create App Directory
 
 ```bash
-mkdir src/apps/my-app
+mkdir -p src/apps/my-awesome-app
 ```
 
-**注意**：
-- slug 必须全小写，用连字符分隔（如 `my-app`）
-- slug 必须唯一且具有描述性
+**Rules**:
+- Use kebab-case for directory names (e.g., `my-awesome-app`)
+- Must be unique across the project
 
-### 步骤 2: 创建 meta.ts
-
-在应用目录下创建 `meta.ts`：
+### Step 2: Create `meta.ts`
 
 ```typescript
-// src/apps/my-app/meta.ts
+// src/apps/my-awesome-app/meta.ts
 import type { AppMeta } from '../../types';
 
 export const meta: AppMeta = {
-  slug: 'my-app',                    // 必须与目录名一致
-  name: '我的应用',                   // 显示名称
-  description: '应用功能描述',        // 简短描述
-  category: 'Data Tools',            // 必须来自预定义类目
-  tags: ['标签1', '标签2'],           // 可选，用于搜索
-  order: 1,                          // 可选，同类目内排序
+  slug: 'my-awesome-app',              // Must match directory name
+  name: 'My Awesome App',               // Display name
+  description: 'Brief description...',  // 1-2 sentences
+  category: 'Data Tools',              // Must be from predefined list
+  tags: ['tag1', 'tag2'],              // Optional, for search
+  order: 1,                            // Optional, sort within category
 };
 ```
 
-### 步骤 3: 创建 App.tsx
-
-在应用目录下创建 `App.tsx`：
+### Step 3: Create `App.tsx`
 
 ```typescript
-// src/apps/my-app/App.tsx
-export default function MyApp() {
+// src/apps/my-awesome-app/App.tsx
+export default function MyAwesomeApp() {
   return (
     <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
-      <h2>我的应用</h2>
-      <p>应用内容...</p>
+      <h2>My Awesome App</h2>
+      <p>App content here...</p>
     </div>
   );
 }
 ```
 
-### 步骤 4: 注册到 registry
+**Rules**:
+- Must use `export default` to export React component
+- Use inline CSS or Tailwind classes (no external UI frameworks)
+- Keep styling lightweight
 
-编辑 `src/registry.ts`，添加新应用：
+### Step 4: Register in `registry.ts`
 
 ```typescript
-// 1. 导入 meta
-import { meta as myAppMeta } from './apps/my-app/meta';
+// src/registry.ts
+import { meta as myAwesomeAppMeta } from './apps/my-awesome-app/meta';
 
-// 2. 添加到 allApps 数组
 export const allApps: AppMeta[] = [
-  // ... 现有应用
-  myAppMeta,
+  // ... existing apps
+  myAwesomeAppMeta,
 ];
 ```
 
-### 步骤 5: 测试
+### Step 5: Test Locally
 
 ```bash
-# 开发模式测试
+# Dev server
 npm run dev
 
-# 构建测试（必须通过）
+# Production build (must pass)
 npm run build
 ```
 
-### 步骤 6: 提交 PR
+### Step 6: Submit PR
 
-创建 Pull Request，包含：
-- PR 标题：`feat: add <应用名称> app`
-- PR 描述：应用功能、所属类目、测试步骤
-- 确保构建通过
+- Title: `feat: add My Awesome App`
+- Description: App function, category, test steps
+- Ensure build passes
 
-## 开发规范
+## Development Rules
 
-### 必须遵守
+### Must Follow
+✅ App directory: `src/apps/<slug>/`
+✅ `slug` must match directory name
+✅ `category` from predefined list (see `src/types.ts`)
+✅ Default export in `App.tsx`
+✅ Register in `src/registry.ts`
+✅ Pass `npm run build`
+✅ Submit via PR (no direct main push)
 
-✅ **必须**：
-- 应用目录必须放在 `src/apps/<slug>/`
-- `meta.ts` 中的 `slug` 必须与目录名一致
-- `category` 必须来自预定义类目（见 `src/types.ts`）
-- `App.tsx` 必须使用 `export default` 导出组件
-- 所有应用必须在 `src/registry.ts` 中注册
-- 代码必须通过 `npm run build`
-- 通过 PR 方式提交
+### Forbidden
+❌ Create custom categories (modify `src/types.ts` first)
+❌ Modify other apps without clear reason
+❌ Add npm dependencies without approval
+❌ Use external UI frameworks (Material-UI, Ant Design, etc.)
+❌ Push directly to main branch
 
-### 禁止行为
+**Detailed rules**: See [CLAUDE.md](./CLAUDE.md)
 
-❌ **禁止**：
-- 随意创建新类目（必须先修改 `src/types.ts`）
-- 修改无关应用的代码
-- 引入未经批准的第三方依赖
-- 使用外部 UI 框架（Material-UI、Ant Design 等）
-- 直接推送到 main 分支
+## n8n Integration Guide
 
-## 项目结构
+For apps requiring external API integration (like ASIN Keywords), use n8n webhooks.
 
-```
-air-filter/
-├── src/
-│   ├── apps/                    # 所有小应用
-│   │   ├── keyword-dedup/       # 关键词去重工具
-│   │   │   ├── App.tsx
-│   │   │   └── meta.ts
-│   │   ├── csv-converter/       # CSV转换器
-│   │   └── profit-calculator/   # 利润计算器
-│   ├── pages/                   # 页面组件
-│   │   ├── HomePage.tsx         # 主页
-│   │   ├── AppPage.tsx          # 应用页
-│   │   └── NotFoundPage.tsx     # 404页
-│   ├── App.tsx                  # 根组件
-│   ├── main.tsx                 # 入口文件
-│   ├── registry.ts              # 应用注册表（单一真相来源）
-│   ├── types.ts                 # 类型定义
-│   └── index.css                # 全局样式
-├── index.html                   # HTML模板
-├── package.json                 # 依赖配置
-├── tsconfig.json                # TypeScript配置
-├── vite.config.ts               # Vite配置
-├── CLAUDE.md                    # 应用添加规则（必读）
-└── README.md                    # 项目文档
+**Setup Steps**:
+1. Create n8n workflow
+2. Enable Webhook Trigger
+3. Copy webhook URL to `.env.local`
+4. Call from app component using `fetch()` or axios
+
+**Complete Guide**: See [docs/n8n-setup.md](./docs/n8n-setup.md)
+
+### Example: Calling n8n from App
+
+```typescript
+const response = await fetch(process.env.N8N_WEBHOOK_URL, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ asin: 'B08N5WRWNW' }),
+});
+
+const data = await response.json();
 ```
 
-## 路由说明
+## Environment Variables Reference
 
-- `/` - 主页（应用列表）
-- `/app/<slug>` - 应用详情页
-- 其他 - 404 页面
+| Variable | Required | Purpose | Example |
+|---|---|---|---|
+| `AUTH_SECRET` | Yes | Session encryption key | `openssl rand -base64 32` |
+| `AUTH_GITHUB_ID` | Yes | GitHub OAuth app ID | `Iv1.1234abcd...` |
+| `AUTH_GITHUB_SECRET` | Yes | GitHub OAuth app secret | `9876xyz...` |
+| `ALLOWED_GITHUB_LOGINS` | Yes* | Whitelist usernames | `user1,user2,user3` |
+| `ALLOWED_EMAIL_DOMAINS` | Yes* | Whitelist email domains | `company.com,partner.com` |
+| `N8N_WEBHOOK_URL` | No | n8n webhook endpoint | `https://n8n.example.com/webhook/...` |
+| `N8N_WEBHOOK_SECRET` | No | n8n webhook secret | `secret123` |
 
-## 部署
+*At least one of `ALLOWED_GITHUB_LOGINS` or `ALLOWED_EMAIL_DOMAINS` is required.
 
-项目支持部署到 GitHub Pages。推送到 `main` 分支会自动触发部署。
+## Troubleshooting
 
-## 故障排查
+### Build Fails
+- Verify `category` in `meta.ts` is from the predefined list
+- Confirm `slug` matches directory name exactly
+- Check app is registered in `src/registry.ts`
 
-### 构建失败
+### App Not Displaying
+- Clear browser cache
+- Verify imports in `registry.ts` are correct
+- Confirm app is added to `allApps` array
 
-1. 检查 `meta.ts` 中的 `category` 是否有效
-2. 检查 `slug` 是否与目录名一致
-3. 检查是否在 `registry.ts` 中注册
+### 404 Errors
+- URL format: `/app/<slug>`
+- Double-check slug spelling and case
 
-### 应用不显示
+### Authentication Issues
+- Generate new `AUTH_SECRET`: `openssl rand -base64 32`
+- Verify GitHub OAuth credentials
+- Check whitelist configuration
+- Confirm callback URL matches GitHub app settings
 
-1. 清除浏览器缓存
-2. 检查 `registry.ts` 导入路径
-3. 检查 `allApps` 数组是否包含新应用
+### n8n Integration Not Working
+- Verify webhook URL is accessible
+- Check request/response format matches n8n workflow
+- Review n8n execution history for errors
+- See [docs/n8n-setup.md](./docs/n8n-setup.md) for detailed steps
 
-### 404 错误
+## Performance & Optimization
 
-1. 检查 URL 格式：`/app/<slug>`
-2. 检查 `slug` 拼写
+- **Next.js 15 Features**: App Router, Server Components, Streaming
+- **Bundle Size**: Minimal dependencies for fast loading
+- **Caching**: Static generation where possible, ISR for dynamic content
+- **Images**: Optimized with next/image
+- **CSS**: Tailwind CSS for efficient styling
 
-## 贡献指南
+## Security
 
-1. Fork 本仓库
-2. 创建功能分支 (`git checkout -b feat/my-app`)
-3. 按照规范添加应用
-4. 提交变更 (`git commit -m 'feat: add my app'`)
-5. 推送分支 (`git push origin feat/my-app`)
-6. 创建 Pull Request
+- OAuth 2.0 authentication via Auth.js
+- Server-side credential management
+- Whitelist-based access control
+- CSRF protection built-in
+- No sensitive data exposed to client
 
-详细规则请参考 [CLAUDE.md](./CLAUDE.md)。
+## Contributing
+
+1. Fork the repository
+2. Create feature branch: `git checkout -b feat/my-app`
+3. Follow [CLAUDE.md](./CLAUDE.md) rules
+4. Test locally: `npm run build`
+5. Commit: `git commit -m 'feat: add my app'`
+6. Push: `git push origin feat/my-app`
+7. Open Pull Request
+
+## API Routes
+
+| Endpoint | Method | Purpose |
+|---|---|---|
+| `/api/auth/*` | POST/GET | OAuth authentication (Auth.js) |
+| `/api/webhooks/n8n` | POST | n8n webhook receiver |
+
+## Monitoring & Debugging
+
+```bash
+# View build output
+npm run build
+
+# Check TypeScript errors
+npx tsc --noEmit
+
+# Lint code
+npm run lint
+
+# Production preview
+npm run build && npm start
+```
+
+## Resources
+
+- **Next.js Docs**: https://nextjs.org/docs
+- **Auth.js Docs**: https://authjs.dev/
+- **Tailwind CSS**: https://tailwindcss.com/docs
+- **n8n Docs**: https://docs.n8n.io/
+- **GitHub OAuth**: https://docs.github.com/en/developers/apps/building-oauth-apps
+
+## FAQ
+
+**Q: Do I need to modify `CLAUDE.md`?**
+A: Only if you're adding new app categories. For new apps, follow existing rules.
+
+**Q: Can I use npm packages?**
+A: Only with clear justification. The project prioritizes minimal dependencies.
+
+**Q: How do I test authentication locally?**
+A: Create a GitHub OAuth app with `http://localhost:3000/api/auth/callback/github` as callback URL.
+
+**Q: Can I use styling frameworks?**
+A: Use Tailwind CSS classes or inline styles. External frameworks are discouraged.
+
+**Q: How do I report bugs?**
+A: Create an issue on GitHub with clear reproduction steps.
 
 ## License
 
-MIT License
+MIT License - See LICENSE file for details.
 
-## 联系方式
+## Support & Contact
 
-如有问题或建议，请提交 Issue。
+- **Issues**: GitHub Issues
+- **Discussions**: GitHub Discussions
+- **Email**: maintainers@example.com
+
+---
+
+**Last Updated**: December 2025
+**Current Version**: 2.0 (Next.js Migration)
+**Status**: Production Ready
