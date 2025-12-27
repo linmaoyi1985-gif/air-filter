@@ -1,0 +1,176 @@
+{
+  "name": "ASIN Keywords - DataForSEO",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "asin-keywords",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "webhookId": "asin-keywords-webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.body.asin }}",
+              "operation": "isNotEmpty"
+            },
+            {
+              "value1": "={{ $json.body.asin }}",
+              "operation": "regex",
+              "value2": "^[A-Z0-9]{10}$"
+            }
+          ]
+        }
+      },
+      "id": "validate-asin",
+      "name": "Validate ASIN",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"error\": \"Invalid ASIN format. ASIN must be exactly 10 alphanumeric characters.\" } }}"
+      },
+      "id": "error-response",
+      "name": "Error Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 450]
+    },
+    {
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "url": "https://api.dataforseo.com/v3/dataforseo_labs/amazon/ranked_keywords/live",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "[0][asin]",
+              "value": "={{ $json.body.asin }}"
+            },
+            {
+              "name": "[0][location_code]",
+              "value": "2840"
+            },
+            {
+              "name": "[0][language_code]",
+              "value": "en"
+            },
+            {
+              "name": "[0][limit]",
+              "value": "200"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "dataforseo-request",
+      "name": "DataForSEO Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [650, 150],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "dataforseo-credentials",
+          "name": "DataForSEO API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputAsin = $input.first().json.body.asin;\nconst apiResponse = $input.first().json;\n\nlet keywords = [];\n\ntry {\n  // DataForSEO response structure:\n  // { tasks: [{ result: [{ items: [{keyword, rank_absolute, keyword_info: {search_volume, cpc}}] }] }] }\n  \n  if (apiResponse.tasks && \n      apiResponse.tasks[0] && \n      apiResponse.tasks[0].result && \n      apiResponse.tasks[0].result[0] && \n      apiResponse.tasks[0].result[0].items) {\n    \n    const items = apiResponse.tasks[0].result[0].items;\n    \n    keywords = items.map(item => ({\n      keyword: item.keyword || '',\n      rank: item.rank_absolute || null,\n      search_volume: item.keyword_info?.search_volume || null,\n      cpc: item.keyword_info?.cpc || null\n    }));\n  }\n} catch (error) {\n  console.error('Error parsing DataForSEO response:', error);\n}\n\nreturn {\n  asin: inputAsin,\n  keywords: keywords\n};"
+      },
+      "id": "parse-response",
+      "name": "Parse Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 150]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}"
+      },
+      "id": "success-response",
+      "name": "Success Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1050, 150]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate ASIN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate ASIN": {
+      "main": [
+        [
+          {
+            "node": "DataForSEO Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DataForSEO Request": {
+      "main": [
+        [
+          {
+            "node": "Parse Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Response": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-12-27T00:00:00.000Z",
+  "versionId": "1"
+}

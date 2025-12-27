@@ -4,12 +4,14 @@ import type { AppMeta } from './types';
 import { meta as keywordDedupMeta } from './apps/keyword-dedup/meta';
 import { meta as csvConverterMeta } from './apps/csv-converter/meta';
 import { meta as profitCalculatorMeta } from './apps/profit-calculator/meta';
+import { meta as asinKeywordsMeta } from './apps/asin-keywords/meta';
 
 // Central registry of all apps
 export const allApps: AppMeta[] = [
   keywordDedupMeta,
   csvConverterMeta,
   profitCalculatorMeta,
+  asinKeywordsMeta,
 ];
 
 // Get app by slug
